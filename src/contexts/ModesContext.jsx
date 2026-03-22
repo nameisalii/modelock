@@ -38,7 +38,7 @@ export function ModesProvider({ children }) {
 
   // Persist to local storage and sync with extension
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && !loading) {
       localStorage.setItem(`modeLock_modes_${currentUser.uid}`, JSON.stringify(modes));
       localStorage.setItem(`modeLock_sessions_${currentUser.uid}`, JSON.stringify(sessions));
       
@@ -47,7 +47,7 @@ export function ModesProvider({ children }) {
         window.postMessage({ type: 'MODELOCK_SYNC_MODES', modes }, '*');
       }
     }
-  }, [modes, sessions, currentUser]);
+  }, [modes, sessions, currentUser, loading]);
 
   const createMode = useCallback(async (modeData) => {
     if (!currentUser) return;

@@ -29,7 +29,14 @@ setInterval(() => {
       if (key && key.startsWith('modeLock_modes_')) {
         const modesData = localStorage.getItem(key);
         if (modesData) {
-          chrome.storage.local.set({ modes: JSON.parse(modesData) });
+          const finalModes = JSON.parse(modesData);
+          // Try both methods of saving to ensure it works across all Chrome versions
+          chrome.storage.local.set({ modes: finalModes });
+          try {
+             chrome.runtime.sendMessage({ type: 'SYNC_MODES', modes: finalModes }, () => {
+                if (chrome.runtime.lastError) {} // ignore
+             });
+          } catch(e) {}
         }
       }
     }

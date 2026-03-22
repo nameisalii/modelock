@@ -182,6 +182,40 @@ export default function ExtensionPage() {
           ))}
         </div>
       </div>
+
+      {/* DEBUG ACTION */}
+      <div style={{ padding: 'var(--space-4)', background: 'var(--color-bg-subtle)', borderRadius: 'var(--radius-md)', border: '1px solid #333' }}>
+        <h4 style={{ marginBottom: 'var(--space-2)' }}>Debug: Force Sync Data</h4>
+        <p style={{ fontSize: 'var(--text-xs)', color: 'var(--color-text-secondary)', marginBottom: 'var(--space-3)' }}>
+          If modes aren't appearing in your extension, click this to manually broadcast them to the content script.
+        </p>
+        <button 
+          className="btn btn--secondary" 
+          onClick={() => {
+            const userId = localStorage.getItem('modeLock_user') ? JSON.parse(localStorage.getItem('modeLock_user')).uid : null;
+            if (!userId) {
+              alert('Debug Error: You are not logged in!');
+              return;
+            }
+            const modesData = localStorage.getItem(`modeLock_modes_${userId}`);
+            if (!modesData || modesData === '[]') {
+              alert('Debug Error: No modes available in LocalStorage! Go to the "Modes" tab and create one first.');
+              return;
+            }
+            try {
+              const modes = JSON.parse(modesData);
+              window.postMessage({ type: 'MODELOCK_SYNC_MODES', modes: modes }, '*');
+              alert(`Success! Broadcasted ${modes.length} mode(s) to the extension.`);
+            } catch (e) {
+              alert('Error parsing modes: ' + e.message);
+            }
+          }}
+        >
+          <RefreshCw size={14} style={{ marginRight: '6px' }} />
+          Force manual sync
+        </button>
+      </div>
+
     </div>
   );
 }
