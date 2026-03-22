@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #0a0a0b;
+      color: #ececf0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 500px;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(124, 92, 252, 0.08) 0%,
+        transparent 60%
+      );
+      pointer-events: none;
+    }
+
+    .blocked-container {
+      text-align: center;
+      max-width: 460px;
+      padding: 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .blocked-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 32px;
+      border-radius: 16px;
+      background: rgba(124, 92, 252, 0.08);
+      border: 1px solid rgba(124, 92, 252, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .blocked-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+    }
+
+    .blocked-mode {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      background: rgba(124, 92, 252, 0.08);
+      border: 1px solid rgba(124, 92, 252, 0.15);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #b09dff;
+      margin-bottom: 20px;
+    }
+
+    .blocked-message {
+      font-size: 15px;
+      color: #8e8e9a;
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+
+    .blocked-url {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: #5c5c68;
+      padding: 8px 16px;
+      background: #161618;
+      border: 1px solid #222225;
+      border-radius: 8px;
+      display: inline-block;
+      margin-bottom: 32px;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .blocked-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .blocked-btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      border: none;
+      cursor: pointer;
+      transition: all 150ms;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .blocked-btn.primary {
+      background: #7c5cfc;
+      color: white;
+    }
+
+    .blocked-btn.primary:hover {
+      background: #6b4ef0;
+      transform: translateY(-1px);
+      box-shadow: 0 0 20px rgba(124, 92, 252, 0.2);
+    }
+
+    .blocked-btn.secondary {
+      background: #161618;
+      color: #ececf0;
+      border: 1px solid #222225;
+    }
+
+    .blocked-btn.secondary:hover {
+      border-color: #333338;
+      background: #1c1c1f;
+    }
+
+    .blocked-footer {
+      margin-top: 48px;
+      font-size: 12px;
+      color: #44444e;
+    }
+  </style>
+</head>
+<body>
+  <div class="blocked-container">
+    <div class="blocked-icon">🔒</div>
+    <h1 class="blocked-title">This site is paused</h1>
+    <div class="blocked-mode" id="modeName">Focus Mode</div>
+    <p class="blocked-message">
+      This website isn't part of your current browsing mode.<br />
+      Stay focused on what matters right now.
+    </p>
+    <div class="blocked-url" id="blockedUrl">—</div>
+    <div class="blocked-actions">
+      <button class="blocked-btn secondary" onclick="history.back()">← Go back</button>
+      <a class="blocked-btn primary" id="dashboardBtn" href="#">Open Dashboard</a>
+    </div>
+    <p class="blocked-footer">Enforced by ModeLock</p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const modeName = params.get('mode') || 'Focus Mode';
+    const blockedUrl = params.get('url') || '';
+
+    document.getElementById('modeName').textContent = modeName;
+
+    if (blockedUrl) {
+      try {
+        const hostname = new URL(blockedUrl).hostname;
+        document.getElementById('blockedUrl').textContent = hostname;
+      } catch (e) {
+        document.getElementById('blockedUrl').textContent = blockedUrl;
+      }
+    }
+
+    document.getElementById('dashboardBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      chrome.tabs.create({ url: 'http://localhost:5173/dashboard' });
+    });
+  </script>
+</body>
+</html>
